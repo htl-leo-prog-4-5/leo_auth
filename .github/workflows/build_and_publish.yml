@@ -25,7 +25,7 @@ jobs:
       - name: Build
         run: dotnet build --configuration ${{env.BUILD_CONFIG}}
       - name: Remove Blazor Debug Proxy Files
-        run: rm -r ./LeoAuth.Server/bin/${{env.BUILD_CONFIG}}/net8.0/BlazorDebugProxy
+        run: rm -r ./LeoAuth.Server/bin/${{env.BUILD_CONFIG}}/net10.0/BlazorDebugProxy
       - name: Create Package Directory
         run: mkdir nupkgs
       - name: Pack
