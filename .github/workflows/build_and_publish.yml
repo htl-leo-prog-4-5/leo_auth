@@ -7,7 +7,11 @@ on:
 
 jobs:
   build:
-    
+
+    permissions:
+      id-token: write   # required for NuGet Trusted Publishing (OIDC)
+      contents: read
+
     env:
       BUILD_CONFIG: 'Release'
       NUGET_DIR: ${{github.workspace}}/nupkgs
@@ -30,9 +34,14 @@ jobs:
         run: mkdir nupkgs
       - name: Pack
         run: dotnet pack --no-build --include-symbols --output ${{env.NUGET_DIR}}
+      - name: NuGet login (OIDC → temp API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{secrets.NUGET_USER}}
       - name: Publish
         working-directory: ${{env.NUGET_DIR}}
-        run: dotnet nuget push *.nupkg -s 'https://api.nuget.org/v3/index.json' -k ${{secrets.NUGET_API_KEY}}
+        run: dotnet nuget push *.nupkg -s 'https://api.nuget.org/v3/index.json' --api-key ${{steps.login.outputs.NUGET_API_KEY}}
       - name: Upload NuGet packages as artifacts
         uses: actions/upload-artifact@v4
         with:
